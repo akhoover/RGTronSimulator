@@ -118,10 +118,14 @@ def game(draw):
 	scry_bottom = True
 	new_card = random.choice(deck)
 	if scry:
-		# If we already have tron, keep Karn, stirrings, or star on top. 
-		if have_tron:
+		# If we have natural tron, keep Karn, stirrings, or star on top.
+		if "Mine" in hand and "PP" in hand and "Tower" in hand:
 			if new_card is "Karn" or new_card is "star" or new_card is "stir":
 				# Keep it
+				scry_bottom = False
+		# If we have non-natural tron, only keep Karn.
+		elif have_tron:
+			if new_card is "Karn":
 				scry_bottom = False
 		# If we have two pieces, keep map, scrying, star, or third piece
 		elif two_in_hand ( hand ):
