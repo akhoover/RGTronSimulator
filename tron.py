@@ -34,11 +34,11 @@ hard_opening = 0
 hard_success = 0
 
 ## Change this to False if you want to always be on the play
-on_the_draw = True 
+on_the_draw = True
 
 ## Number of simulations
 ## N = 100000 should take a couple of seconds, N = million ~30 seconds.
-N = 1000000
+N = 100000
 
 def two_in_hand(hand):
 	return (
@@ -53,7 +53,7 @@ def two_in_hand(hand):
 def game(draw):
 	# Populate the deck
 	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir", "Karn", "Karn", "Karn", "Karn"]
-	for x in range(24):
+	for x in range(60 - len(deck)):
 		deck.append("dead")
 	
 	# Keep track of stats
