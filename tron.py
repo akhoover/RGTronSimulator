@@ -52,11 +52,7 @@ def two_in_hand(hand):
 
 def game(draw):
 	# Populate the deck
-<<<<<<< HEAD
-	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir", "Karn", "Karn", "Karn", "Karn"]
-=======
 	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir", "Karn", "Karn", "Karn", "Karn"]
->>>>>>> 3b6257b99aeef7804037de6880360f62eed4dc3a
 	for x in range(60 - len(deck)):
 		deck.append("dead")
 	
