@@ -93,9 +93,10 @@ def game(draw):
 
 	scry = starting_hand < 7
 	scry_bottom = True
-	new_card = random.choice( deck )
+	new_card = ""
 	if scry and not have_tron:
-		
+	
+		new_card = random.choice( deck )
 		#Have two pieces, keep map or third piece
 		if two_in_hand( hand ):
 			if new_card in {"map", "Tower", "Mine", "PP"} and new_card not in hand:
@@ -107,10 +108,43 @@ def game(draw):
 			if new_card == "stir" and ( "star" in hand or "forest" in hand ):
 				scry_bottom = False 
 						
-
 	# Main loop for turns!
+	turn = 1
+	tron = False
+	while not tron:
+		
+		# initialize mana to 0
+		mana = 0
+		green = 0
+		lands_played = 0
 
-	
-			
-				
-			
+		# draw a card
+		if draw or turn != 1:
+			if new_card == "":
+				new_card = random.choice( deck )
+			hand.append( new_card )
+			deck.remove( new_card )
+			new_card == ""
+
+		# tap lands for mana
+		for card in field:
+			if card in {"Mine", "PP", "Tower", "gq"}:
+				mana += 1
+			if card == "Forest":
+				mana += 1
+				green += 1
+
+		# crack stars for green
+		if "star" in field:
+			field.remove( "star" )
+			green += 1
+
+		# play a new tron land
+		for card in hand:
+			if card in {"Mine", "PP", "Tower"} and card not in field and lands_played == 0:
+				hand.remove( card )
+				field.append( card )
+				mana += 1
+				lands_played = 1
+
+		# 
