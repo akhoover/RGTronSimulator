@@ -5,6 +5,8 @@ Authors: /u/Azgurath
 
 import random
 import sys
+# from tronFunctions import two_in_hand, two_tron, use_map, use_scry 
+from tronFunctions import *
 
 ## Draw or Play, from command line
 
@@ -16,45 +18,6 @@ else:
 ## Number of games to test, from command line
 
 N = int(sys.argv[2])
-
-## Useful functions
-
-def two_in_hand(hand):
-	return(
-			( "Mine" in hand and "PP" in hand )
-		or
-			( "Mine" in hand and "Tower" in hand )
-		or
-			( "PP" in hand and "Tower" in hand )
-		)
-
-def two_tron( hand, field ):
-	
-	for card in ["Tower", "Mine", "PP"]:
-		if card in hand or card in field:
-			for new_card in ["Tower", "Mine", "PP"]:
-				if new_card in hand or new_card in field:
-					if new_card != card:
-						return True
-	
-	return False
-
-
-def use_map( hand, field, deck ):
-
-	field.remove( "map" )
-	for card in ["Tower", "Mine", "PP"]:
-		if card not in hand and card not in field:
-			deck.remove( card )
-			hand.append( card )
-
-def use_scry( hand, field, deck ):
-	
-	hand.remove( "scry" )
-	for card in ["Tower", "Mine", "PP"]:
-		if card not in hand and card not in field:
-			deck.remove( card )
-			hand.append( card )
 
 def game(draw):
 	# Populate deck
@@ -176,11 +139,6 @@ def game(draw):
 				mana += 1
 				green += 1
 
-		# crack stars for green
-		if "star" in field:
-			field.remove( "star" )
-			green += 1
-
 		# play a new tron land
 		for card in hand:
 			if card in {"Mine", "PP", "Tower"} and card not in field and lands_played == 0:
@@ -188,6 +146,18 @@ def game(draw):
 				field.append( card )
 				mana += 1
 				lands_played = 1
+
+		# check if we have tron
+		if "PP" in field and "Tower" in field and "Mine" in field:
+			tron = True
+
+		# crack stars for green
+		if "star" in field:
+			field.remove( "star" )
+			new_card = random.choice( deck )
+			deck.remove( new_card )
+			hand.append( new_card )
+			green += 1
 
 		# if two tron pieces, use map or scrying
 		if two_tron( hand, field ):
@@ -206,15 +176,18 @@ def game(draw):
 				field.append( "map" )
 				mana -= 1
 
-			# cast star
-			if "star" in hand and mana > 0:
-				hand.remove( "star" )
-				field.append( "star" )
-				mana -= 1
+		# if mana, cast stirrings
+		if green > 0 and mana > 0 and "stir" in hand:
+			# use stirrings
+			green -= 1
+			mana -= 1
+			use_stir( hand, field, deck )
 
-		# check if we have tron
-		if "PP" in field and "Tower" in field and "Mine" in field:
-			tron = True
+		# cast star
+		if "star" in hand and mana > 0:
+			hand.remove( "star" )
+			field.append( "star" )
+			mana -= 1
 
 		# end turn
 
