@@ -48,7 +48,7 @@ def use_map( hand, field, deck ):
 			deck.remove( card )
 			hand.append( card )
 
-def use_scry( hand, deck ):
+def use_scry( hand, field, deck ):
 	
 	hand.remove( "scry" )
 	for card in ["Tower", "Mine", "PP"]:
@@ -95,12 +95,12 @@ def game(draw):
 
 		#2 pieces
 		elif( starting_size <= 6 
-			and ( two_in_hand(hand)):
+			and two_in_hand(hand)):
 			decided_on_hand = True
 
 		#1 piece
 		elif( starting_size <= 4
-			and ( "Tower" in hand or "Mine" in hand or "PP" in hand ):
+			and ( "Tower" in hand or "Mine" in hand or "PP" in hand )):
 			decided_on_hand = True
 
 		#Mull to 3
@@ -119,7 +119,7 @@ def game(draw):
 
 	# Scry if mulliganed
 
-	scry = starting_hand < 7
+	scry = starting_size < 7
 	scry_bottom = True
 	new_card = ""
 	if scry and not have_tron:
@@ -135,11 +135,15 @@ def game(draw):
 				scry_bottom = False
 			if new_card == "stir" and ( "star" in hand or "forest" in hand ):
 				scry_bottom = False 
+
+		# if scry_bottom:
+			# deck.remove( new_card )
+			# new_card = ""
 						
 	# Main loop for turns!
 	turn = 0
 	tron = False
-	while not tron:
+	while not tron and turn < 4:
 
 		# increment turn counter
 		turn += 1
@@ -150,12 +154,19 @@ def game(draw):
 		lands_played = 0
 
 		# draw a card
-		if draw or turn != 1:
+
+		# if it's the first card after scrying
+		if (draw and turn == 1) or (not draw and turn == 2):
 			if new_card == "":
 				new_card = random.choice( deck )
 			hand.append( new_card )
 			deck.remove( new_card )
-			new_card == ""
+
+		# otherwise
+		elif draw or turn != 1:
+			new_card = random.choice( deck )
+			hand.append( new_card )
+			deck.remove( new_card )
 
 		# tap lands for mana
 		for card in field:
@@ -179,14 +190,14 @@ def game(draw):
 				lands_played = 1
 
 		# if two tron pieces, use map or scrying
-		if two_tron():
+		if two_tron( hand, field ):
 			# use map
 			if "map" in field and mana > 1:
-				use_map( field, hand, deck )
+				use_map( hand, field,  deck )
 				mana -= 2
 			# cast scrying
 			if "scry" in hand and mana > 1 and green > 0:
-				use_scrying( hand, deck )
+				use_scry( hand, field, deck )
 				mana -= 2
 				green -= 1
 			# cast map
@@ -214,5 +225,11 @@ turn_three_tron = 0
 should_tron = 0
 
 for i in range( N ):
-	state = game( on_the_draw )
-	turn_three_tron = state[
+	turn, tron = game( on_the_draw )
+	if turn == 3:
+		turn_three_tron += 1
+	if tron:
+		should_tron += 1
+
+print "Turn three tron: ", turn_three_tron
+print "Should be at least: ", should_tron
