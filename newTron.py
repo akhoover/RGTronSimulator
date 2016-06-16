@@ -28,6 +28,34 @@ def two_in_hand(hand):
 			( "PP" in hand and "Tower" in hand )
 		)
 
+def two_tron( hand, field ):
+	
+	for card in ["Tower", "Mine", "PP"]:
+		if card in hand or card in field:
+			for new_card in ["Tower", "Mine", "PP"]:
+				if new_card in hand or new_card in field:
+					if new_card != card:
+						return True
+	
+	return False
+
+
+def use_map( hand, field, deck ):
+
+	field.remove( "map" )
+	for card in ["Tower", "Mine", "PP"]:
+		if card not in hand and card not in field:
+			deck.remove( card )
+			hand.append( card )
+
+def use_scry( hand, deck ):
+	
+	hand.remove( "scry" )
+	for card in ["Tower", "Mine", "PP"]:
+		if card not in hand and card not in field:
+			deck.remove( card )
+			hand.append( card )
+
 def game(draw):
 	# Populate deck
 	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir"]
@@ -109,9 +137,12 @@ def game(draw):
 				scry_bottom = False 
 						
 	# Main loop for turns!
-	turn = 1
+	turn = 0
 	tron = False
 	while not tron:
+
+		# increment turn counter
+		turn += 1
 		
 		# initialize mana to 0
 		mana = 0
@@ -147,4 +178,41 @@ def game(draw):
 				mana += 1
 				lands_played = 1
 
-		# 
+		# if two tron pieces, use map or scrying
+		if two_tron():
+			# use map
+			if "map" in field and mana > 1:
+				use_map( field, hand, deck )
+				mana -= 2
+			# cast scrying
+			if "scry" in hand and mana > 1 and green > 0:
+				use_scrying( hand, deck )
+				mana -= 2
+				green -= 1
+			# cast map
+			if "map" in hand and mana > 0:
+				hand.remove( "map" )
+				field.append( "map" )
+				mana -= 1
+
+			# cast star
+			if "star" in hand and mana > 0:
+				hand.remove( "star" )
+				field.append( "star" )
+				mana -= 1
+
+		# check if we have tron
+		if "PP" in field and "Tower" in field and "Mine" in field:
+			tron = True
+
+		# end turn
+
+
+	return( turn, have_tron )
+
+turn_three_tron = 0
+should_tron = 0
+
+for i in range( N ):
+	state = game( on_the_draw )
+	turn_three_tron = state[
