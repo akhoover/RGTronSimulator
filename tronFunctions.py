@@ -28,7 +28,15 @@ def use_map( hand, field, deck ):
 	field.remove( "map" )
 	for card in ["Tower", "Mine", "PP"]:
 		if card not in hand and card not in field:
-			deck.remove( card )
+			try:
+				deck.remove( card )
+			except ValueError:
+				print "Hand: "
+				print hand
+				print "Field: "
+				print field
+				print "Deck:"
+				print deck
 			hand.append( card )
 
 def use_scry( hand, field, deck ):
@@ -36,7 +44,10 @@ def use_scry( hand, field, deck ):
 	hand.remove( "scry" )
 	for card in ["Tower", "Mine", "PP"]:
 		if card not in hand and card not in field:
-			deck.remove( card )
+			try:
+				deck.remove( card )
+			except:
+				print "Oops..."
 			hand.append( card )
 
 def use_stir( hand, field, deck ):

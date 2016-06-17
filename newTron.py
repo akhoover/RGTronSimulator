@@ -21,7 +21,7 @@ N = int(sys.argv[2])
 
 def game(draw):
 	# Populate deck
-	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir"]
+	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir", "forest", "forest", "forest", "forest", "forest", "gq", "gq"]
 	for x in range(60 - len(deck)):
 		deck.append("dead")
 
@@ -135,7 +135,7 @@ def game(draw):
 		for card in field:
 			if card in {"Mine", "PP", "Tower", "gq"}:
 				mana += 1
-			if card == "Forest":
+			if card == "forest":
 				mana += 1
 				green += 1
 
@@ -205,6 +205,52 @@ def game(draw):
 				hand.append( new_card )
 				did_something = True
 
+		# play a new tron land
+		if lands_played == 0:
+			for card in hand:
+				if card in {"Mine", "PP", "Tower"} and card not in field:
+					hand.remove( card )
+					field.append( card )
+					mana += 1
+					lands_played = 1
+					if two_tron( hand, field ):
+						if "map" in field and mana > 1:
+							use_map( hand, field, deck )
+							mana -= 2
+						if "scry" in hand and green > 0 and mana > 1:
+							use_scry( hand, field, deck )
+							green -= 1
+							mana -= 2
+						if "map" in hand and mana > 0:
+							hand.remove( "map" )
+							field.append( "map" )
+							mana -= 1
+						
+			if lands_played == 0:
+				for card in hand:
+					if card == "forest":
+						hand.remove( card )
+						field.append( card )
+						mana += 1
+						green += 1
+						lands_played = 1
+			if lands_played == 0:
+				for card in hand:
+					if card == "gq":
+						hand.remove( card )
+						field.append( card )
+						mana += 1
+						lands_played = 1
+
+			if "stir" in hand and green > 0 and mana > 0:
+				use_stir( hand, field, deck )
+				green -= 1
+				mana -= 1
+
+			if "star" in hand and mana > 0:
+				hand.remove( "star" )
+				field.append( "star" )
+				mana -= 1
 		# end turn
 
 
@@ -213,6 +259,7 @@ def game(draw):
 turn_three_tron = 0
 total_turns = 0
 should_tron = 0
+failed_to_tron = 0
 
 for i in range( N ):
 	turn, tron = game( on_the_draw )
@@ -220,10 +267,14 @@ for i in range( N ):
 		turn_three_tron += 1
 	if tron:
 		should_tron += 1
+	# if turn < 10:
 	total_turns += turn
+	#else:
+	#	failed_to_tron += 1
 
-avg_turns = total_turns / float( i )
+avg_turns = total_turns / float( i - failed_to_tron )
 
 print "Turn three tron: ", turn_three_tron
 print "Should be at least: ", should_tron
 print "Average turn tron: ", avg_turns
+print "Failed to get tron by tun 10: ", failed_to_tron
