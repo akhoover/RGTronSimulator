@@ -99,14 +99,14 @@ def game(draw):
 			if new_card == "stir" and ( "star" in hand or "forest" in hand ):
 				scry_bottom = False 
 
-		# if scry_bottom:
-			# deck.remove( new_card )
-			# new_card = ""
+		if scry_bottom:
+			deck.remove( new_card )
+			new_card = ""
 						
 	# Main loop for turns!
 	turn = 0
 	tron = False
-	while not tron and turn < 4:
+	while not tron:
 
 		# increment turn counter
 		turn += 1
@@ -176,18 +176,34 @@ def game(draw):
 				field.append( "map" )
 				mana -= 1
 
-		# if mana, cast stirrings
-		if green > 0 and mana > 0 and "stir" in hand:
-			# use stirrings
-			green -= 1
-			mana -= 1
-			use_stir( hand, field, deck )
+		did_something = True
+		while mana > 0 and did_something:
 
-		# cast star
-		if "star" in hand and mana > 0:
-			hand.remove( "star" )
-			field.append( "star" )
-			mana -= 1
+			did_something = False
+
+			# if mana, cast stirrings
+			if green > 0 and mana > 0 and "stir" in hand:
+				# use stirrings
+				green -= 1
+				mana -= 1
+				use_stir( hand, field, deck )
+				did_something = True
+
+			# cast star
+			if "star" in hand and mana > 0:
+				hand.remove( "star" )
+				field.append( "star" )
+				mana -= 1
+				did_something = True
+
+			# crack star
+			if "star" in field and mana > 0:
+				field.remove( "star" )
+				green += 1
+				new_card = random.choice( deck )
+				deck.remove( new_card )
+				hand.append( new_card )
+				did_something = True
 
 		# end turn
 
@@ -195,6 +211,7 @@ def game(draw):
 	return( turn, have_tron )
 
 turn_three_tron = 0
+total_turns = 0
 should_tron = 0
 
 for i in range( N ):
@@ -203,6 +220,10 @@ for i in range( N ):
 		turn_three_tron += 1
 	if tron:
 		should_tron += 1
+	total_turns += turn
+
+avg_turns = total_turns / float( i )
 
 print "Turn three tron: ", turn_three_tron
 print "Should be at least: ", should_tron
+print "Average turn tron: ", avg_turns
