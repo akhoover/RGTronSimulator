@@ -23,9 +23,11 @@ def two_tron( hand, field ):
 	return False
 
 
-def use_map( hand, field, deck ):
+def use_map( hand, field, deck, bottom ):
 
 	field.remove( "map" )
+	deck.extend( bottom )
+	bottom = []
 	for card in ["Tower", "Mine", "PP"]:
 		if card not in hand and card not in field:
 			try:
@@ -39,9 +41,11 @@ def use_map( hand, field, deck ):
 				print deck
 			hand.append( card )
 
-def use_scry( hand, field, deck ):
+def use_scry( hand, field, deck, bottom ):
 	
 	hand.remove( "scry" )
+	deck.extend( bottom )
+	bottom = []
 	for card in ["Tower", "Mine", "PP"]:
 		if card not in hand and card not in field:
 			try:
@@ -50,7 +54,7 @@ def use_scry( hand, field, deck ):
 				print "Oops..."
 			hand.append( card )
 
-def use_stir( hand, field, deck ):
+def use_stir( hand, field, deck, bottom ):
 	
 	hand.remove( "stir" )
 	cards = random.sample( deck, 5 )
@@ -103,3 +107,5 @@ def use_stir( hand, field, deck ):
 
 	for card in cards:
 		deck.remove( card )
+		bottom.append( card )
+

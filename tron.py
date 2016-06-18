@@ -34,7 +34,7 @@ hard_opening = 0
 hard_success = 0
 
 ## Change this to False if you want to always be on the play
-on_the_draw = True
+on_the_draw = False
 
 ## Number of simulations
 ## N = 100000 should take a couple of seconds, N = million ~30 seconds.

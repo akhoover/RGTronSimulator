@@ -5,7 +5,6 @@ Authors: /u/Azgurath
 
 import random
 import sys
-# from tronFunctions import two_in_hand, two_tron, use_map, use_scry 
 from tronFunctions import *
 
 ## Draw or Play, from command line
@@ -21,12 +20,15 @@ N = int(sys.argv[2])
 
 def game(draw):
 	# Populate deck
-	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir", "forest", "forest", "forest", "forest", "forest", "gq", "gq"]
+	deck = ["Mine", "Mine", "Mine", "Mine", "PP", "PP", "PP", "PP", "Tower", "Tower", "Tower", "Tower", "star", "star", "star", "star", "star", "star", "star", "star", "map", "map", "map", "map", "scry", "scry", "scry", "scry", "stir", "stir", "stir", "stir", "forest", "forest", "forest", "forest", "forest", "gq", "gq", "Karn", "Karn", "Karn", "Karn"]
 	for x in range(60 - len(deck)):
 		deck.append("dead")
 
 	# Populate field
 	field = []
+
+	# Populate cards on bottom
+	bottom = []
 
 	# Populate starting hand
 	starting_size = 7
@@ -104,6 +106,7 @@ def game(draw):
 
 		if scry_bottom:
 			deck.remove( new_card )
+			bottom.append( new_card )
 			new_card = ""
 						
 	# Main loop for turns!
@@ -166,11 +169,11 @@ def game(draw):
 		if two_tron( hand, field ):
 			# use map
 			if "map" in field and mana > 1:
-				use_map( hand, field,  deck )
+				use_map( hand, field,  deck, bottom )
 				mana -= 2
 			# cast scrying
 			if "scry" in hand and mana > 1 and green > 0:
-				use_scry( hand, field, deck )
+				use_scry( hand, field, deck, bottom )
 				mana -= 2
 				green -= 1
 			# cast map
@@ -189,7 +192,7 @@ def game(draw):
 				# use stirrings
 				green -= 1
 				mana -= 1
-				use_stir( hand, field, deck )
+				use_stir( hand, field, deck, bottom )
 				did_something = True
 
 			# cast star
@@ -218,10 +221,10 @@ def game(draw):
 					lands_played = 1
 					if two_tron( hand, field ):
 						if "map" in field and mana > 1:
-							use_map( hand, field, deck )
+							use_map( hand, field, deck, bottom )
 							mana -= 2
 						if "scry" in hand and green > 0 and mana > 1:
-							use_scry( hand, field, deck )
+							use_scry( hand, field, deck, bottom )
 							green -= 1
 							mana -= 2
 						if "map" in hand and mana > 0:
@@ -246,7 +249,7 @@ def game(draw):
 						lands_played = 1
 
 			if "stir" in hand and green > 0 and mana > 0:
-				use_stir( hand, field, deck )
+				use_stir( hand, field, deck, bottom )
 				green -= 1
 				mana -= 1
 
@@ -257,18 +260,27 @@ def game(draw):
 		# end turn
 
 
-	return( turn, starting_size )
+	return( turn, starting_size, "Karn" in hand )
 
 turn_three_tron = 0
+turn_three_karn = 0
+total_have_karn = 0
 total_turns = 0
 failed_to_tron = 0
 failed_starting_size = 0
 success_starting_size = 0
 
 for i in range( N ):
-	turn, starting_size = game( on_the_draw )
+	turn, starting_size, have_karn = game( on_the_draw )
 	if turn == 3:
 		turn_three_tron += 1
+
+	if turn == 3 and have_karn:
+		turn_three_karn += 1
+
+	if have_karn:
+		total_have_karn += 1
+
 	if turn < 10:
 		total_turns += turn
 		success_starting_size += starting_size
@@ -280,8 +292,10 @@ avg_turns = total_turns / float( i - failed_to_tron )
 failed_avg_size = failed_starting_size / float( failed_to_tron )
 avg_size = success_starting_size / float( i - failed_to_tron )
 
-print "Turn three tron: ", turn_three_tron
+print "Turn three tron: ", turn_three_tron / float( i ) * 100
+print "Turn three Karn: ", turn_three_karn / float( i ) * 100
 print "Average turn tron: ", avg_turns
-print "Failed to get tron by tun 10: ", failed_to_tron
+print "Have Karn when tron is done: ", total_have_karn / float( i ) * 100
+print "Failed to get tron by tun 10: ", failed_to_tron / float( i ) * 100
 print "Mulled to an average of: ", avg_size
 print "When failed to get tron, mulled to: ", failed_avg_size
