@@ -57,21 +57,24 @@ def game(draw):
 			decided_on_hand = True
 
 		#2 pieces
-		elif( starting_size <= 6 
-			and two_in_hand(hand)):
-			decided_on_hand = True
+		if starting_size <= 6 and not decided_on_hand:
+			if two_in_hand(hand):
+				decided_on_hand = True
+			if "Tower" in hand or "Mine" in hand or "PP" in hand:
+				if "map" in hand or "scry" in hand:
+					decicded_on_hand = True
 
 		#1 piece
-		elif( starting_size <= 4
-			and ( "Tower" in hand or "Mine" in hand or "PP" in hand )):
-			decided_on_hand = True
+		if starting_size <= 4 and not decided_on_hand:
+			if "Tower" in hand or "Mine" in hand or "PP" in hand:
+				decided_on_hand = True
 
 		#Mull to 3
-		elif starting_size <= 3 :
+		if starting_size <= 3 and not decided_on_hand:
 			decided_on_hand = True
 
 		#Mulligan
-		else:
+		if not decided_on_hand:
 			starting_size -= 1
 			hand = random.sample( deck, starting_size )
 
@@ -254,27 +257,31 @@ def game(draw):
 		# end turn
 
 
-	return( turn, have_tron )
+	return( turn, starting_size )
 
 turn_three_tron = 0
 total_turns = 0
-should_tron = 0
 failed_to_tron = 0
+failed_starting_size = 0
+success_starting_size = 0
 
 for i in range( N ):
-	turn, tron = game( on_the_draw )
+	turn, starting_size = game( on_the_draw )
 	if turn == 3:
 		turn_three_tron += 1
-	if tron:
-		should_tron += 1
-	# if turn < 10:
-	total_turns += turn
-	#else:
-	#	failed_to_tron += 1
+	if turn < 10:
+		total_turns += turn
+		success_starting_size += starting_size
+	else:
+		failed_to_tron += 1
+		failed_starting_size += starting_size
 
 avg_turns = total_turns / float( i - failed_to_tron )
+failed_avg_size = failed_starting_size / float( failed_to_tron )
+avg_size = success_starting_size / float( i - failed_to_tron )
 
 print "Turn three tron: ", turn_three_tron
-print "Should be at least: ", should_tron
 print "Average turn tron: ", avg_turns
 print "Failed to get tron by tun 10: ", failed_to_tron
+print "Mulled to an average of: ", avg_size
+print "When failed to get tron, mulled to: ", failed_avg_size
